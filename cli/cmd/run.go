@@ -27,6 +27,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -133,6 +134,14 @@ func init() {
 	runCmd.Flags().StringVarP(&o.slackSigningSecret, "secret", "s", "default", "slack signing secret")
 	runCmd.Flags().StringVarP(&o.slackBotToken, "token", "t", "default", "slack bot token")
 
-	runCmd.MarkFlagRequired("secret")
-	runCmd.MarkFlagRequired("token")
+	err := runCmd.MarkFlagRequired("secret")
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	err = runCmd.MarkFlagRequired("token")
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
 }
