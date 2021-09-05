@@ -29,6 +29,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/ks6088ts/slack-events-listener-go/internal"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 	"github.com/spf13/cobra"
@@ -38,6 +39,7 @@ type runOptions struct {
 	slackSigningSecret string
 	slackBotToken      string
 	port               int
+	verbose            bool
 }
 
 var (
@@ -82,7 +84,12 @@ var runCmd = &cobra.Command{
 				return
 			}
 
-			if eventsAPIEvent.Type == slackevents.URLVerification {
+			if o.verbose {
+				log.Printf("%v\n", eventsAPIEvent)
+			}
+
+			switch eventsAPIEvent.Type {
+			case slackevents.URLVerification:
 				var r *slackevents.ChallengeResponse
 				err := json.Unmarshal([]byte(body), &r)
 				if err != nil {
@@ -96,14 +103,41 @@ var runCmd = &cobra.Command{
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-			}
-			if eventsAPIEvent.Type == slackevents.CallbackEvent {
+			case slackevents.CallbackEvent:
 				innerEvent := eventsAPIEvent.InnerEvent
+				if o.verbose {
+					log.Printf("%v\n", innerEvent)
+				}
 				switch ev := innerEvent.Data.(type) {
 				case *slackevents.AppMentionEvent:
+					if o.verbose {
+						log.Println(ev)
+					}
 					if _, _, err := api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false)); err != nil {
 						log.Println(err)
 					}
+				case *slackevents.ReactionAddedEvent:
+					if o.verbose {
+						log.Println(ev)
+					}
+					log.Printf("do something with channel=%v, reaction=%v\n", ev.Item.Channel, ev.Reaction)
+				case *slackevents.MessageEvent:
+					if o.verbose {
+						log.Println(ev)
+					}
+					// filter other subtypes: https://api.slack.com/events/message#subtypes
+					if ev.SubType != "" {
+						return
+					}
+
+					// convert timestamp
+					ts, err := internal.GetTimeFromSlackTimeStamp(ev.TimeStamp)
+					if err != nil {
+						log.Println(err)
+						return
+					}
+
+					log.Printf("do something with %v, %v\n", ev.Text, ts.Format("2006年01月02日 15時04分05秒"))
 				}
 			}
 		})
@@ -121,6 +155,7 @@ func init() {
 	runCmd.Flags().IntVarP(&o.port, "port", "p", 8080, "port number")
 	runCmd.Flags().StringVarP(&o.slackSigningSecret, "secret", "s", "default", "slack signing secret")
 	runCmd.Flags().StringVarP(&o.slackBotToken, "token", "t", "default", "slack bot token")
+	runCmd.Flags().BoolVarP(&o.verbose, "verbose", "v", false, "verbosity")
 
 	err := runCmd.MarkFlagRequired("secret")
 	if err != nil {
