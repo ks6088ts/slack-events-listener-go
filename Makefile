@@ -6,10 +6,10 @@ GOLANGCILINT_VERSION ?= 1.42.0
 GORELEASER_VERSION ?= 0.174.2
 COBRA_VERSION ?= 1.2.1
 LDFLAGS ?= '-s -w \
-	-X "github.com/ks6088ts/template-go/internal.Revision=$(shell git rev-parse --short HEAD)" \
-	-X "github.com/ks6088ts/template-go/internal.Version=$(shell git describe --tags $$(git rev-list --tags --max-count=1))" \
+	-X "github.com/ks6088ts/slack-events-listener-go/internal.Revision=$(shell git rev-parse --short HEAD)" \
+	-X "github.com/ks6088ts/slack-events-listener-go/internal.Version=$(shell git describe --tags $$(git rev-list --tags --max-count=1))" \
 '
-BIN_NAME ?= template-go
+BIN_NAME ?= slack-events-listener-go
 
 .PHONY: help
 help:

@@ -1,4 +1,4 @@
-module github.com/ks6088ts/template-go
+module github.com/ks6088ts/slack-events-listener-go
 
 go 1.16
 

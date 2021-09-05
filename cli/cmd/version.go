@@ -26,7 +26,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ks6088ts/template-go/internal"
+	"github.com/ks6088ts/slack-events-listener-go/internal"
 	"github.com/spf13/cobra"
 )
 

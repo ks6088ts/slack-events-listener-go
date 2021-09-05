@@ -1,4 +1,4 @@
-project_name: template-go
+project_name: slack-events-listener-go
 env:
   - GO111MODULE=on
 before:
@@ -16,8 +16,8 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
-      - -X 'github.com/ks6088ts/template-go/internal.Revision={{.ShortCommit}}'
-      - -X 'github.com/ks6088ts/template-go/internal.Version={{.Version}}'
+      - -X 'github.com/ks6088ts/slack-events-listener-go/internal.Revision={{.ShortCommit}}'
+      - -X 'github.com/ks6088ts/slack-events-listener-go/internal.Version={{.Version}}'
 archives:
   - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     replacements:

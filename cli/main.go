@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/ks6088ts/template-go/cli/cmd"
+import "github.com/ks6088ts/slack-events-listener-go/cli/cmd"
 
 func main() {
 	cmd.Execute()
