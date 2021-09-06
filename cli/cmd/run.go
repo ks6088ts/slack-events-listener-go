@@ -40,6 +40,8 @@ type runOptions struct {
 	slackBotToken      string
 	port               int
 	verbose            bool
+	credentialsPath    string
+	sheetId            string
 }
 
 var (
@@ -137,7 +139,12 @@ var runCmd = &cobra.Command{
 						return
 					}
 
-					log.Printf("do something with %v, %v\n", ev.Text, ts.Format("2006年01月02日 15時04分05秒"))
+					// update sheet
+					err = internal.UpdateSheet(o.credentialsPath, o.sheetId, ev.Text, ts.Format("2006年01月02日 15時04分05秒"))
+					if err != nil {
+						log.Println(err)
+						return
+					}
 				}
 			}
 		})
@@ -156,6 +163,8 @@ func init() {
 	runCmd.Flags().StringVarP(&o.slackSigningSecret, "secret", "s", "default", "slack signing secret")
 	runCmd.Flags().StringVarP(&o.slackBotToken, "token", "t", "default", "slack bot token")
 	runCmd.Flags().BoolVarP(&o.verbose, "verbose", "v", false, "verbosity")
+	runCmd.Flags().StringVarP(&o.credentialsPath, "credentials", "c", "default", "path to credentials file")
+	runCmd.Flags().StringVarP(&o.sheetId, "sheetId", "i", "default", "sheet ID")
 
 	err := runCmd.MarkFlagRequired("secret")
 	if err != nil {
