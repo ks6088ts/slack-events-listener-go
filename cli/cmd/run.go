@@ -19,6 +19,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
+// Package cmd ...
 package cmd
 
 import (
@@ -56,6 +58,11 @@ var runCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		api := slack.New(o.slackBotToken)
 		signingSecret := o.slackSigningSecret
+		sheetClient, err := internal.NewSheetClient(o.credentialsPath, o.sheetId)
+		if err != nil {
+			log.Println(err)
+			return
+		}
 
 		http.HandleFunc("/slack/events", func(w http.ResponseWriter, r *http.Request) {
 			body, err := ioutil.ReadAll(r.Body)
@@ -140,7 +147,7 @@ var runCmd = &cobra.Command{
 					}
 
 					// update sheet
-					err = internal.UpdateSheet(o.credentialsPath, o.sheetId, ev.Text, ts.Format("2006年01月02日 15時04分05秒"))
+					err = sheetClient.AppendValues(ev.Text, ts.Format("2006年01月02日 15時04分05秒"))
 					if err != nil {
 						log.Println(err)
 						return

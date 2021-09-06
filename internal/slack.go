@@ -2,7 +2,6 @@ package internal
 
 import (
 	"errors"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -13,8 +12,7 @@ func GetTimeFromSlackTimeStamp(ts string) (time.Time, error) {
 	array := strings.Split(ts, ".")
 	unixtime, err := strconv.ParseInt(array[0], 10, 64)
 	if err != nil {
-		log.Println(err)
-		return time.Time{}, errors.New("Failed to ParseInt()")
+		return time.Time{}, errors.New("Failed to parse as int")
 	}
 	return time.Unix(unixtime, 0), nil
 }
