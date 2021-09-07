@@ -28,13 +28,14 @@ func NewSheetClient(filepath, sheetId string) (*SheetClient, error) {
 }
 
 // AppendValues appends arguments to a sheet
-func (client *SheetClient) AppendValues(text, timestamp string) error {
+func (client *SheetClient) AppendValues(items ...string) error {
 	// create ValueRange
 	var row []interface{}
 	var rows [][]interface{}
 	var vr sheets.ValueRange
-	row = append(row, text)
-	row = append(row, timestamp)
+	for _, item := range items {
+		row = append(row, item)
+	}
 	rows = append(rows, row)
 	vr.Values = append(vr.Values, rows...)
 

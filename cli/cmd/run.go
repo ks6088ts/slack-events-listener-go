@@ -28,7 +28,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/ks6088ts/slack-events-listener-go/internal"
@@ -61,7 +60,6 @@ var runCmd = &cobra.Command{
 		sheetClient, err := internal.NewSheetClient(o.credentialsPath, o.sheetId)
 		if err != nil {
 			log.Println(err)
-			return
 		}
 
 		http.HandleFunc("/slack/events", func(w http.ResponseWriter, r *http.Request) {
@@ -152,6 +150,9 @@ var runCmd = &cobra.Command{
 						log.Println(err)
 						return
 					}
+					if o.verbose {
+						log.Printf("successfully appended %v, %v\n", ev.Text, ts.Format("2006年01月02日 15時04分05秒"))
+					}
 				}
 			}
 		})
@@ -173,14 +174,13 @@ func init() {
 	runCmd.Flags().StringVarP(&o.credentialsPath, "credentials", "c", "default", "path to credentials file")
 	runCmd.Flags().StringVarP(&o.sheetId, "sheetId", "i", "default", "sheet ID")
 
-	err := runCmd.MarkFlagRequired("secret")
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-	err = runCmd.MarkFlagRequired("token")
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
+	for _, requiredCmd := range []string{
+		"secret",
+		"token",
+	} {
+		err := runCmd.MarkFlagRequired(requiredCmd)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
